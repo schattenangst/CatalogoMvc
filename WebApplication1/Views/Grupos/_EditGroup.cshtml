@@ -1,0 +1,56 @@
+﻿@model CatalogoMvc.Entities.GrupoEntity
+
+<div class="col-sm-12">
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data", id = "form" }))
+    {
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(true)
+
+        @Html.HiddenFor(model => model.IdGrupo)
+
+        <div class="row">
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>Nombre:</label>
+                    @Html.TextBoxFor(model => model.Nombre, new { @class = "form-control", @maxlength = "10", @required = "required", })
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label>Grupo:</label>
+                    @Html.DropDownList("profesores", ViewBag.Profesores as SelectList, new { @disabled = "disabled" })
+                </div>
+            </div>
+        </div>
+    }
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        //Validaciones
+        $("#form").validate();
+        jQuery.extend(jQuery.validator.messages, { required: "El campo es requerido." });
+
+        ////Formulario
+        $("#form").ajaxForm({
+            success: function (data) {
+                if (data.msg == "ok") {
+                    dg.empty();
+                    dg.dialog("destroy");
+                    alert("Registro Correcto");
+                    GetListGroup();
+                }
+                else {
+                    alert(data.msg);
+                }
+            },
+            error: function (status) {
+                alert(status.statusText);
+            }
+        });
+    });
+
+</script>
+
+
+

@@ -1,0 +1,108 @@
+﻿@{
+    ViewBag.Title = "Listado Alumnos";
+}
+<br />
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="form-group">
+            </div>
+        </div>
+        <div class="col-md-4 text-right">
+            <br /><button type="button" class="btn btn-primary" onclick="CreateUser()">New User <i class="glyphicon glyphicon-plus"></i></button>
+        </div>
+    </div><br />
+    <div class="row">
+        <div id="tableUser" class="col-md-12">
+
+        </div>
+    </div>
+</div>
+
+@section scripts{
+
+    <script type="text/javascript">
+        var dg = $("<div></div>");
+        $(document).ready(function () {
+            GetListUser();
+        });
+
+        $(".filtro").on("change", function (e) {
+            GetListUser();
+        });
+
+        function GetListUser() {
+            $("#tableUser").load("/Alumnos/_ListUser?roleId=" + $("#UserRole").val());
+            return false;
+        }
+
+        function CreateUser() {
+            openModal("/Alumnos/_CreateUser/", "Crear Registro", "900px");
+            return false;
+        }
+
+        function EditUser(id) {
+            openModal("/Alumnos/_EditUser/" + id, "Editar Registro", "900px");
+            return false;
+        }
+
+        function DeleteUser(id) {
+            var con = confirm("Se eliminara el registro seleccionado ¿Desea continuar?");
+            if (con == true) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Alumnos/_DeleteUser/?IdAlumno=" + id,
+                    success: function (data) {
+                        if (data.msg == "ok") {
+                            alert("Registro Eliminado Correctamente");
+                            GetListUser();
+                        }
+                        else {
+                            alert(data.msg);
+                        }
+                    },
+                    error: function (status) {
+                        alert(status.statusText);
+                    }
+                });
+            }
+            return false;
+        }
+
+        function openModal(url, title, width) {
+            dg.dialog({
+                position: { my: "center center", at: "center center", of: window },
+                autoOpen: false,
+                show: { effect: 'fade' },
+                modal: true,
+                draggable: false,
+                resizable: false,
+                width: width,
+                title: title,
+                buttons: [{
+                    id: "btnSave",
+                    html: "<i class='fas fa-save'></i>&nbsp; Guardar",
+                    'class': "btn btn-primary btn-xs",
+                    click: function () {
+                        $("#form").submit();
+                    },
+                }, {
+                    id: "btnClose",
+                    html: "<i class='fas fa-times'></i>&nbsp; Cerrar",
+                    'class': "btn btn-default btn-xs",
+                    click: function () {
+                        $(this).empty();
+                        $(this).dialog("destroy");
+                    }
+                }],
+                open: function (event, ui) {
+                    $(this).load(url);
+                }
+            });
+            dg.empty();
+            dg.dialog('open');
+            return false;
+        }
+    </script>
+
+}
